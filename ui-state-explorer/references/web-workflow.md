@@ -1,0 +1,86 @@
+# Mode B — Web Output
+
+Deliverable: the existing web project/prototype with every missing state implemented in product code, plus a **State Explorer** toggle (bottom-right) that previews each state. With the explorer closed the page behaves exactly as before. The explorer never ships to production.
+
+## B1. Read (inventory)
+
+1. Find the entry point and the UI code: single HTML file, or framework project (look at `package.json`, `index.html`, `src/`). Identify how UI is rendered (static DOM, vanilla render functions, React/Vue/Svelte components) and where state lives (variables, store, component state, URL).
+2. Run it. Use the project's dev command if it has one; for a static file serve the folder (`python3 -m http.server`) — opening via `file://` breaks fetch. Open it in the browser and take a screenshot of the default state.
+3. Exercise the happy path once (click the main action, fill the form) and note every interaction, network call and data dependency.
+4. Note the styling system: CSS variables/tokens, utility classes, component library, existing feedback components (toast, spinner, skeleton, alert, dialog) and existing state classes (`:disabled`, `.is-error`, `aria-invalid` styles).
+5. If a Figma design is also provided as reference, read it per `figma-workflow.md` A1 for visual intent, but implement in the web project.
+
+Then run SKILL.md Steps 3–4 and save `ui-states-checklist.md` in the project root.
+
+## B2. Implement the states in product code
+
+Each state is real UI that the product needs in real use (a real failed request must show the real error state). Implement them where the happy path is implemented:
+
+- Model the state, don't paint it: add explicit status to the existing state model (`status: 'idle' | 'loading' | 'success' | 'error'`, `items: []`, `errors: { field: msg }`, `quota`, `role`…). Render from it.
+- Reuse existing components, classes and tokens. New styles use existing CSS variables; never hard-code new colors if a token exists.
+- Happy-path rendering must produce the same DOM/visual output as before for the default data. Refactor only as much as needed to add a status branch.
+- Wire real triggers where they already exist (fetch failure → error state, empty response → empty state, invalid input → validation). For triggers that depend on unconfirmed rules (quota, plan), add the state behind a clearly named input (`quota.remaining`) with placeholder copy and a `// TODO(PM): …` comment referencing the checklist ID.
+- Accessibility: `aria-busy` on loading regions, `role="alert"`/live region for errors and toasts, `aria-invalid` + `aria-describedby` for field errors, real `disabled` attribute (plus visible reason), visible focus.
+
+## B3. Choose the seam for the explorer
+
+The explorer must drive the app's own state — not overwrite DOM. Pick the least invasive seam that exists:
+
+1. **App state setter / store** (best): expose it to the explorer in dev only, e.g.
+   `if (import.meta.env.DEV) window.__APP_STATE__ = { set, reset, submit }`.
+   For plain-script prototypes, attach `window.__APP_STATE__` inside the explorer-include block (see B5) or have the app expose it only when `window.StateExplorer` exists.
+2. **Data layer stub**: `ctx.mockFetch()` or `ctx.stub(service, 'method', fn)` then trigger the real action. Good for loading/error/empty/partial states because the full real flow runs.
+3. **Static markup with no state model**: first refactor the region into `render(state)` with the original markup as the default output, then use seam 1.
+
+Interaction states (hover/focus/active) can't be forced by script. Implement them in CSS, and in the explorer add a state that applies a preview class (`ctx.addClass(el, 'is-hover')`) only if the CSS defines matching `.is-hover` rules alongside `:hover`; otherwise list them as "verify manually" in the checklist.
+
+Responsive states depend on the real viewport: use `ctx.note('Resize below …px')`, or if the app uses container queries, constrain the container with a preview class.
+
+## B4. Add the State Explorer
+
+1. Copy `assets/state-explorer/state-explorer.js` to `<project>/state-explorer/state-explorer.js` unchanged.
+2. Create `<project>/state-explorer/states.js` from `states.example.js`: one entry per built checklist item, same ID, name, trigger, expected UI, priority and confirmation text as the checklist.
+3. `reset()` must restore the exact default: prefer the app's own reset; otherwise snapshot the initial state object when `states.js` loads and restore it. Use `location.reload()` only as a last resort.
+4. Each `apply(ctx)` sets state through the seam and may use `ctx.mockFetch / ctx.stub / ctx.addClass / ctx.onCleanup` — all automatically undone when leaving the state. Never write fixtures to `localStorage`, cookies or a real backend.
+
+Explorer behavior (provided by the runtime, don't rebuild it):
+- Toggle button fixed bottom-right ("States"), keyboard shortcut Alt+Shift+S.
+- Open → menu grouped by category, filterable, with ID, name, P0/P1/P2 badge and "?" badge for states needing confirmation; selecting shows trigger, expected UI and open question.
+- Selecting a state runs cleanup + `reset()` first, so states never stack.
+- `DEF-00` returns to the original happy path; closing the panel (×, toggle, Esc) resets and returns to normal use.
+- Rendered in Shadow DOM, highest z-index; doesn't change product styles or focus order when closed.
+
+## B5. Isolation from production
+
+The explorer and `states.js` are dev/prototype tooling. Apply **all** that fit the project:
+
+- **Bundled projects (Vite, Next, CRA, etc.)**: load via a dynamic import behind a build-time flag so it is tree-shaken out of production:
+  ```js
+  if (import.meta.env.DEV || import.meta.env.VITE_STATE_EXPLORER === 'true') {
+    import('../state-explorer/state-explorer.js').then(() => import('../state-explorer/states.js'));
+  }
+  ```
+  (`process.env.NODE_ENV !== 'production'` for webpack/Next.) The dev-only seam (`window.__APP_STATE__`) uses the same guard.
+- **Plain HTML prototypes**: add one clearly delimited include block before `</body>`:
+  ```html
+  <!-- STATE-EXPLORER:START — prototype only, delete this block for production -->
+  <script src="state-explorer/state-explorer.js"></script>
+  <script src="state-explorer/states.js"></script>
+  <!-- STATE-EXPLORER:END -->
+  ```
+  Removing the block + the `state-explorer/` folder must leave a working product page.
+- **Runtime guard**: the runtime refuses to mount when `<html data-env="production">` or `window.__STATE_EXPLORER_DISABLED__ = true`; pass a `guard` option for project-specific checks.
+- Product code must never import from `state-explorer/`, and must work if the folder is absent.
+- States use stubs restored on cleanup — no persistent side effects.
+
+## B6. Verify (in the browser)
+
+1. Explorer closed: run the original happy path end to end; compare with the B1 screenshot; console has no errors.
+2. Open the explorer, click through **every** state: correct UI appears, nothing from the previous state remains, no console errors. Screenshot each P0 state.
+3. Return to `DEF-00` and close the panel: page identical to default and fully usable.
+4. Isolation check: with `data-env="production"` on `<html>` (or a production build) the toggle doesn't appear. For bundled projects run the production build and grep the output for `StateExplorer`.
+5. Update the checklist Status column, then report: run command / file paths, counts, screenshots of key states, open questions, items not built.
+
+## Figma input → web output
+
+Read the Figma frame for analysis and visual intent (`figma-workflow.md` A1), implement in the web project following B2–B6. Do not create Figma frames.
