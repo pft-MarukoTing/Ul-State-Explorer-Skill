@@ -32,7 +32,9 @@ Figma input + Figma delivery → Mode A. No web prototype produced.
 - Panel instance detached in 4 frames (VAL-01, VAL-02, DIS-01, PERM-01) to insert helper text; noted in each annotation. Nested components stay linked.
 
 ## Open items for PM / RD / Design
-See "Open questions" in `ui-states-checklist.md` (8 questions). Biggest: credit refund on failure (ERR-02/03), disable-vs-validate policy (DIS-01 vs VAL-01), Alert has no Error tone.
+See "Open questions" in `ui-states-checklist.md` (8 questions). Biggest: credit refund on failure (ERR-02/03), disable-vs-validate policy (DIS-01 vs VAL-01).
+
+> **Correction (2026-11-02):** "Alert has no Error tone" was wrong. The Alert set has Error, Warning, Success, Information, Neutral, Brand, Inverse neutral and Inverse brand tones; only the instance in the screen used Warning. The Generate and Import media disabled treatments (opacity 40%) should have used Button State=Disabled / the Fill·Text·Icon Disabled tokens. See Test A2.
 
 ## Skill improvements made from this test (generic, no page logic)
 Added to `references/figma-workflow.md`: check BOOLEAN/VARIANT props on container instances for hidden state coverage (preview via throwaway clones); treat hidden leftover layers with caution; rules for insertion into instances (detach nearest region only, in the state frame), overlays as state-frame children, locating nodes in fresh clones by child path, and the board/card layout.

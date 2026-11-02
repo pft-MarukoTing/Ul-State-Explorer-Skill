@@ -10,6 +10,11 @@
  *     states: [ { id, category, name, trigger, expected, priority, confirm, apply(ctx) } ],
  *   });
  *
+ * Variants (compare two designs of the same state, e.g. "as built" vs "as decided"):
+ *   { id, name, ..., variants: [ { id: 'rd', label: 'RD', expected }, { id: 'figma', label: 'Figma', expected } ],
+ *     apply(ctx) { ...ctx.variant is the selected variant id... } }
+ * The detail area shows a switch; the first variant is the default.
+ *
  * Isolation: init() refuses to mount when
  *   - <html data-env="production">, or
  *   - window.__STATE_EXPLORER_DISABLED__ === true, or
@@ -35,6 +40,7 @@
   let root = null;
   let isOpen = false;
   let activeId = null;
+  let activeVariant = null;
   let cleanups = [];
   let applying = Promise.resolve();
   let noteText = '';
@@ -115,14 +121,19 @@
     }
   }
 
-  function select(id) {
+  function select(id, variantId) {
     applying = applying.then(async () => {
       await backToDefault();
       const s = opts.states.find((x) => x.id === id);
       activeId = s ? s.id : null;
+      activeVariant = s && s.variants && s.variants.length
+        ? (s.variants.some((v) => v.id === variantId) ? variantId : s.variants[0].id)
+        : null;
       document.documentElement.setAttribute('data-ui-state', activeId || 'DEF-00');
+      if (activeVariant) document.documentElement.setAttribute('data-ui-variant', activeVariant);
+      else document.documentElement.removeAttribute('data-ui-variant');
       if (s && s.apply) {
-        try { await s.apply(makeCtx()); } catch (e) {
+        try { await s.apply(Object.assign(makeCtx(), { variant: activeVariant })); } catch (e) {
           console.error('[StateExplorer] apply failed for ' + id, e);
           noteText = 'apply() threw - see console.';
         }
@@ -139,7 +150,9 @@
     applying = applying.then(async () => {
       await backToDefault();
       activeId = null;
+      activeVariant = null;
       document.documentElement.removeAttribute('data-ui-state');
+      document.documentElement.removeAttribute('data-ui-variant');
       render();
     });
     return applying;
@@ -182,6 +195,10 @@
     .b { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px; background: #2c2c34; color: #c9c9d1; }
     .b.P0 { background: #5a1f24; color: #ffb4b4; } .b.P1 { background: #4d3b14; color: #ffd98a; } .b.P2 { background: #253244; color: #a9c7ff; }
     .b.q { background: #3b2b52; color: #d9c2ff; }
+    .b.v { background: #1f3d36; color: #9ee6cf; }
+    .seg { display: flex; gap: 4px; margin-bottom: 8px; padding: 3px; border-radius: 8px; background: #101013; border: 1px solid #2c2c34; }
+    .seg button { flex: 1; padding: 6px 8px; border: 0; border-radius: 6px; background: none; color: #c9c9d1; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .seg button[aria-pressed="true"] { background: #2b3550; color: #fff; }
     .detail { border-top: 1px solid #2c2c34; padding: 10px 14px 12px; color: #c9c9d1; font-size: 12px; line-height: 1.45; }
     .detail dt { color: #8b8b96; font-size: 11px; margin-top: 6px; }
     .detail dd { margin: 0; }
@@ -245,6 +262,7 @@
           const current = (activeId || 'DEF-00') === s.id;
           const badges = el('span', { class: 'badges' }, [
             s.priority ? el('span', { class: 'b ' + s.priority, text: s.priority }) : null,
+            s.variants ? el('span', { class: 'b v', title: 'Has variants to compare', text: s.variants.map((v) => v.label).join('/') }) : null,
             s.confirm ? el('span', { class: 'b q', title: 'Needs confirmation: ' + s.confirm, text: '?' }) : null,
           ]);
           list.appendChild(el('button', {
@@ -286,8 +304,14 @@
       box.appendChild(el('div', { text: 'Showing the original default state. Pick a state to preview it; close the panel to return to normal use.' }));
       return;
     }
+    const variant = s.variants ? s.variants.find((v) => v.id === activeVariant) : null;
+    if (s.variants) {
+      box.appendChild(el('div', { class: 'seg', role: 'group', 'aria-label': 'Variant' }, s.variants.map((v) =>
+        el('button', { 'aria-pressed': v.id === activeVariant ? 'true' : 'false', text: v.label, onclick: () => select(s.id, v.id) })
+      )));
+    }
     const dl = el('dl', { style: 'margin:0' });
-    [['Trigger', s.trigger], ['Expected UI', s.expected], ['Needs confirmation', s.confirm]].forEach(([k, v]) => {
+    [['Trigger', s.trigger], ['Expected UI', (variant && variant.expected) || s.expected], ['Needs confirmation', s.confirm]].forEach(([k, v]) => {
       if (!v) return;
       dl.appendChild(el('dt', { text: k }));
       dl.appendChild(el('dd', { text: v }));
@@ -324,12 +348,14 @@
     },
     open, close, select,
     get activeId() { return activeId; },
+    get activeVariant() { return activeVariant; },
     destroy() {
       runCleanups();
       document.removeEventListener('keydown', onKey, true);
       if (host) host.remove();
-      host = root = null; isOpen = false; activeId = null;
+      host = root = null; isOpen = false; activeId = null; activeVariant = null;
       document.documentElement.removeAttribute('data-ui-state');
+      document.documentElement.removeAttribute('data-ui-variant');
     },
   };
   window.StateExplorer = api;

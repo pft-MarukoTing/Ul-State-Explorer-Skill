@@ -18,13 +18,21 @@ One checklist per analysed screen (or one per flow with a section per screen). T
 - Interactions: …
 - Data dependencies: …
 
+## Pattern decisions
+| Family | Applies to | Decision | Source |
+|--------|-----------|----------|--------|
+| F4 Long task | LOAD-01 | Indeterminate bar + step text, Cancel allowed | User |
+| F5 Action error | ERR-01 | Inline banner in result area + Retry | User |
+| F10 Text length — prompt title | EDGE-02 | 2 lines, "…" + expand arrow | User |
+| F9 Empty — history | EMP-01 | Icon + one-line text + primary CTA | default (unconfirmed) |
+
 ## Missing states
 
-| ID | Category | State name | Scope | Trigger | Expected UI | Reuse | Priority | Confirm | Status |
-|----|----------|-----------|-------|---------|-------------|-------|----------|---------|--------|
-| LOAD-01 | Loading | Result — generating | Result panel | User clicks Generate; request pending | Button → loading variant; result area skeleton matching result card | Button/Loading, Skeleton | P0 | RD: is progress % available? | Built |
-| ERR-01 | Error | Generate failed | Result panel | Request fails / times out | Inline error in result area, inputs kept, "Try again" secondary button | Banner/Error | P0 | PM: copy | Built |
-| PERM-01 | Permission | Out of credits | Generate button | Credits = 0 | Button disabled + helper "You've used all credits. [Upgrade]" | Button/Disabled, Link | P1 | PM: plan names, upgrade target | Built (placeholder copy) |
+| ID | Category | State name | Scope | Trigger | Pattern | Expected UI | Reuse | Priority | Confirm | Status |
+|----|----------|-----------|-------|---------|---------|-------------|-------|----------|---------|--------|
+| LOAD-01 | Loading | Result — generating | Result panel | User clicks Generate; request pending | F4 | Button → loading variant; result area indeterminate bar + step text + Cancel | Button/Loading, Progress | P0 | RD: is progress % available? | Built |
+| ERR-01 | Error | Generate failed | Result panel | Request fails / times out | F5 | Inline banner in result area, inputs kept, "Try again" secondary button | Banner/Error | P0 | PM: copy | Built |
+| PERM-01 | Permission | Out of credits | Generate button | Credits = 0 | F17 | Button disabled + helper "You've used all credits. [Upgrade]" | Button/Disabled, Link | P1 | PM: plan names, upgrade target | Built (placeholder copy) |
 
 ## Already covered by the guideline
 | State | Where it exists |
@@ -51,7 +59,9 @@ One checklist per analysed screen (or one per flow with a section per screen). T
 - **ID** — `<CODE>-<nn>`; codes: `DEF EMP LOAD ERR DIS VAL INT EDGE PERM RESP PART DEST BIZ`. `DEF-00` is always the untouched original.
 - **State name** — `<Region> — <condition>`; no generic names like "Error".
 - **Trigger** — an observable condition ("upload > {maxSize}", "API returns 5xx", "list has 0 items after filter"), never vague ("when something goes wrong").
-- **Expected UI** — the delta from default only.
+- **Pattern** — the family ID from `pattern-questions.md` whose decision this state follows (`—` if no family applies).
+- **Expected UI** — the delta from default only, following the decided pattern.
+- **Pattern decisions → Source** — `User` (answered in Step 4), `Guideline` (found in the design system and confirmed), or `default (unconfirmed)` (user chose "use recommended defaults").
 - **Reuse** — component/variant/token names from the design system, or `NEW`.
 - **Confirm** — `—`, `PM`, `RD`, or `PM+RD` followed by the specific question.
 - **Status** — `Built`, `Built (placeholder copy)`, `Not built`, `Covered`.
@@ -70,6 +80,9 @@ One checklist per analysed screen (or one per flow with a section per screen). T
 {
   "screen": "Tool page",
   "mode": "B",
+  "patterns": [
+    { "family": "F4", "appliesTo": ["LOAD-01"], "decision": "Indeterminate bar + step text, Cancel allowed", "source": "User" }
+  ],
   "states": [
     {
       "id": "LOAD-01",
@@ -77,7 +90,8 @@ One checklist per analysed screen (or one per flow with a section per screen). T
       "name": "Result — generating",
       "scope": "Result panel",
       "trigger": "User clicks Generate; request pending",
-      "expectedUI": "Button loading; result skeleton",
+      "pattern": "F4",
+      "expectedUI": "Button loading; indeterminate bar + step text + Cancel",
       "reuse": ["Button/Loading", "Skeleton"],
       "priority": "P0",
       "confirm": { "who": "RD", "question": "Is progress % available?" },

@@ -53,7 +53,7 @@
 | 5 | PM | Which media limit blocks import (count or duration)? | EDGE-01 |
 | 6 | PM | Delete: confirmation dialog or undo toast? | DEST-01 |
 | 7 | RD | Is per-file upload progress available? Which import errors can be told apart? | LOAD-02, ERR-01 |
-| 8 | Design | Alert has only a Warning tone — add an Error tone? | ERR-01, ERR-02 |
+| 8 | Design | ~~Alert has only a Warning tone~~ — wrong: the Alert set has an Error tone (see Test A2) | ERR-01, ERR-02 |
 
 ## New patterns (needs design review)
 | Item | Why new | Used by |

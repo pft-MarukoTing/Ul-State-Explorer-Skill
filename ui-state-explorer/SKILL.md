@@ -1,6 +1,6 @@
 ---
 name: ui-state-explorer
-description: Find and build the UI states a design is missing beyond the happy path — loading, empty, error, disabled, validation, interaction, edge cases, permission, responsive, retry, destructive and business-specific states. Produces a Missing State Checklist, then delivers the states either as editable Figma frames (Mode A) or as a State Explorer toggle inside a web prototype (Mode B). Use when the user asks to "fill in missing states", "add loading/empty/error states", "what states am I missing", "state coverage", "edge cases for this screen", "UI states for RD handoff", "state explorer", or shares a Figma frame or web page and wants non-happy-path states designed or implemented.
+description: Find and build the UI states a design is missing beyond the happy path — loading, empty, error, disabled, validation, interaction, edge cases, permission, responsive, retry, destructive and business-specific states. Asks the user which presentation pattern the team uses for each state family (skeleton vs spinner, toast vs alert dialog, text clamp lines and tooltip vs expand, empty-state illustration and CTA…), produces a Missing State Checklist, then delivers the states either as editable Figma frames (Mode A) or as a State Explorer toggle inside a web prototype (Mode B). Use when the user asks to "fill in missing states", "add loading/empty/error states", "what states am I missing", "state coverage", "edge cases for this screen", "UI states for RD handoff", "state explorer", or shares a Figma frame or web page and wants non-happy-path states designed or implemented.
 ---
 
 # UI State Explorer
@@ -14,9 +14,10 @@ The analysis is shared; only the output step differs. Never hard-code anything a
 1. **Pick the mode** (Step 1) — Figma output or Web output.
 2. **Inventory the source UI** (Step 2) — screens, regions, components, interactions, data.
 3. **Run the state analysis** (Step 3) — walk the taxonomy, keep only states that apply.
-4. **Write the Missing State Checklist** (Step 4) — share it before building.
-5. **Build the states** — Mode A: `references/figma-workflow.md`. Mode B: `references/web-workflow.md`.
-6. **Verify and report** (Step 6).
+4. **Ask how each state should look** (Step 4) — skeleton or spinner, toast or alert, how many lines before truncating… Always ask; never guess the team's patterns.
+5. **Write the Missing State Checklist** (Step 5) — with the pattern decisions applied.
+6. **Build the states** (Step 6) — Mode A: `references/figma-workflow.md`. Mode B: `references/web-workflow.md`.
+7. **Verify and report** (Step 7).
 
 ---
 
@@ -51,7 +52,7 @@ Record, per screen:
 - **Interactions**: every action the user can take and what it triggers (submit, upload, generate, save, delete, paginate, filter, sign-in-gated actions).
 - **Data**: every value that comes from the user or a server — counts, names, lists, images, prices, quotas, timestamps. Each data dependency implies Loading / Empty / Error / Overflow candidates.
 - **Existing guideline coverage**: states already designed or documented (other frames, component variants, a states page, code branches). These are excluded from "missing".
-- **Design system**: tokens/variables, text styles, spacing scale, existing feedback components (toast, banner, skeleton, spinner, empty-state illustration, inline error).
+- **Design system**: tokens/variables, text styles, spacing scale, existing feedback components (toast, banner, skeleton, spinner, empty-state illustration, inline error), and state tokens (disabled, hover, error…). Read the team's Design System Map first if one exists (`references/design-system-map.md`); otherwise search by role and synonyms, and read each candidate's variant properties (`references/pattern-questions.md` → "Find the guideline's pattern").
 
 ## Step 3 — State analysis
 
@@ -88,13 +89,28 @@ Never invent product rules (limits, quotas, plan names, retry counts, error copy
 - use a neutral placeholder in the UI (`{limit}`, `[Plan name]`, "Something went wrong. Try again."),
 - mark it `Needs confirmation` with the specific question.
 
-## Step 4 — Missing State Checklist
+## Step 4 — Ask the presentation-pattern questions
 
-Write the checklist using `references/checklist-format.md` (Markdown table + optional JSON). Save it as `ui-states-checklist.md` beside the deliverable (web project root, or alongside the Figma work in the session folder), and also place it in Figma for Mode A.
+The analysis says *which* states are missing; it cannot say *how* this team presents them. The same state has several common treatments — loading can be a skeleton, a spinner, a progress bar or a streaming result; an error can be a toast, an inline banner or a modal alert; long text can be clamped to 1–3 lines and revealed by a hover tooltip, an expand arrow or a "Read more" link; an empty state can have an illustration and/or a CTA to the next step. These are team decisions. **Always ask before building** — this step is not optional, even when the checklist is short.
 
-Show the checklist to the user before building when there are open P0 questions or more than ~15 states; otherwise build directly and present it with the result.
+Follow `references/pattern-questions.md`:
+- Group the kept states into pattern families (F1–F20) and ask one question per family that is actually triggered — never one per state, never about families with no states.
+- Offer the common options for each family, not yes/no. Put the pattern found in the guideline first as `(Recommended — found in …)`; otherwise mark the most common practice as recommended.
+- Ask text-length questions per text role (title, description, filename, button label): max lines **and** how the rest is revealed.
+- Use the `AskUserQuestion` tool when available (≤ 4 questions per call, P0 families first, ≤ 3 rounds); otherwise send one numbered message the user can answer in shorthand.
+- Ask in the user's language, using names from their screen.
+- Offer "use the recommended defaults for the rest"; record those as `default (unconfirmed)`.
+- For every chosen pattern with no component or token found, ask in the same round whether one exists (link) or it should be created as `NEW`. Never create `NEW` without that answer.
 
-## Step 5 — Build
+Pattern questions do not replace product-rule questions (limits, plan names, copy) — those stay as `Needs confirmation` placeholders and can be asked in the same round if they are P0.
+
+## Step 5 — Missing State Checklist
+
+Write the checklist using `references/checklist-format.md` (Markdown table + optional JSON), including the **Pattern decisions** section from Step 4. Every state's Expected UI follows the decided pattern, and a family uses the same pattern across the whole screen. Save it as `ui-states-checklist.md` beside the deliverable (web project root, or alongside the Figma work in the session folder), and also place it in Figma for Mode A.
+
+Show the checklist to the user before building when there are still open P0 questions or more than ~15 states; otherwise build directly and present it with the result.
+
+## Step 6 — Build
 
 - Mode A → `references/figma-workflow.md`
 - Mode B → `references/web-workflow.md`
@@ -102,27 +118,35 @@ Show the checklist to the user before building when there are open P0 questions 
 ## Shared design principles (both modes)
 
 - **Do not redesign.** Keep layout, typography, color, spacing, radius, iconography and component structure. A state changes only what the state requires.
-- **Guideline first.** Use existing components, variants, variables/tokens and patterns. Create something new only when nothing fits, and label it `NEW — needs design review`.
+- **Guideline first.** Use existing components, variants, variables/tokens and patterns. States switch the component's own state variant or bind state tokens — never raw opacity or colours when a token exists. A disabled group/region follows the team's group rule (e.g. whole region at a fixed opacity). Create something new only when the user confirmed nothing fits, and label it `NEW — needs design review`.
+- **Stay team-neutral.** This skill carries no team's components. Team-specific choices live in that team's Design System Map, not in the skill.
 - **Fill gaps only.** States already covered by the guideline are listed as "Covered" and not rebuilt.
 - **Happy path is untouched.** The original frame/page and its behavior must be identical after the work. In Figma never edit the source frame; in web the explorer-off experience must behave exactly as before.
 - **No unconfirmed product decisions.** Placeholders + confirmation flags instead.
+- **No guessed patterns.** How a state is presented (skeleton vs spinner, toast vs alert, clamp lines, empty-state CTA) comes from the user's answers in Step 4, not from habit.
 - **Review- and dev-ready.** Every state is named by ID, grouped by category, and carries its trigger so designers can review and RD can inspect.
 - **Accessible states.** Error/validation messages are associated with their fields, disabled controls keep readable contrast, focus states are visible, loading states announce progress (`aria-busy` / live region in web; annotated in Figma).
 
-## Step 6 — Verify and report
+## Step 7 — Verify and report
 
 Before reporting, check:
 - [ ] Every checklist item is built, or marked "Not built" with a reason.
 - [ ] Source happy path unchanged (Figma: source frame untouched; web: explorer off = original behavior, no console errors).
-- [ ] Only existing tokens/components used, or `NEW` items flagged.
+- [ ] Every state uses the pattern decided in Step 4 (no silent fallback to a different existing component).
+- [ ] Only existing tokens/components used, or `NEW` items flagged and confirmed by the user.
+- [ ] Audit of changed nodes: no raw opacity/colour where a state variant or token exists; list every remaining raw value and `NEW` item in the report.
 - [ ] Names follow the convention of the mode.
 - [ ] Mode B: explorer cannot load in production (see isolation rules).
 
-Report to the user: mode chosen and why, counts by category and priority, where the output is (Figma link / file paths), the open PM/RD questions, and anything not built.
+If no Design System Map existed, offer to write one from this run's findings and answers (`references/design-system-map.md`), saved where the team will find it next time.
+
+Report to the user: mode chosen and why, the pattern decisions (and which were unconfirmed defaults), counts by category and priority, where the output is (Figma link / file paths), the open PM/RD questions, and anything not built.
 
 ## Reference files
 
 - `references/state-taxonomy.md` — detection questions and typical expected UI per category.
+- `references/pattern-questions.md` — pattern families, common options, how to find the guideline's pattern and how to ask (Step 4).
+- `references/design-system-map.md` — team-owned map of patterns → components and states → tokens; where to find it and its format.
 - `references/checklist-format.md` — checklist template, priority definitions, JSON schema.
 - `references/figma-workflow.md` — Mode A step by step (Figma MCP).
 - `references/web-workflow.md` — Mode B step by step.

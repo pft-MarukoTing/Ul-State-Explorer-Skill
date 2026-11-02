@@ -16,14 +16,15 @@ Deliverable: editable Figma frames, one per missing state, built from the origin
 4. `get_variable_defs` — color/spacing/radius/typography variables in use. Every new fill/stroke/spacing must bind to these.
 5. Discover existing state coverage:
    - With `use_figma` (read-only script): for each instance, read `mainComponent.parent` — if it is a component set, list its `variantGroupProperties` (e.g. `State: Default | Hover | Disabled | Loading | Error`). Existing variants = states already covered at component level, and they are what you switch to.
-   - Search the page/file for frames that already depict states of this screen (names containing loading/empty/error/…); `search_design_system` for feedback components: `toast`, `snackbar`, `banner`, `alert`, `skeleton`, `spinner`, `progress`, `empty`, `dialog`, `modal`, `tooltip`, `badge`, `input error`.
+   - Search the page/file for frames that already depict states of this screen (names containing loading/empty/error/…); `search_design_system` (restricted with `includeLibraryKeys` to the libraries the source uses) for feedback components by role and synonyms (`pattern-questions.md` → "Find the guideline's pattern"), and for state tokens (`disabled`, `hover`, `press`, `error`, `overlay`).
+   - For every candidate component set, import it and read `componentPropertyDefinitions` (all variant options, booleans). Do the same for the component sets of instances already in the screen — e.g. a Button set with `State=Disabled`. Record what exists; "the frame shows Tone=Warning" says nothing about which tones the set has.
 6. Also read each container instance's `componentProperties`: BOOLEAN props (e.g. "Show Alert", "Show usage") and VARIANT props on large containers (a canvas/panel with `Empty`/`Upload`/`History` variants) often already hold state patterns. Preview them by cloning the source frame off-canvas, switching the property, taking `node.screenshot()`, then removing the clone (also remove clones if the script errors). Anything found there is **Covered** — reuse it instead of redrawing.
 7. Hidden layers inside the source frame may be leftovers from other screens. Do not treat them as this screen's guideline unless their content clearly belongs to it; mention them in the checklist notes.
 8. Fill the inventory from SKILL.md Step 2.
 
 ## A2. Analyse and write the checklist
 
-Run SKILL.md Step 3 and Step 4. Save `ui-states-checklist.md` locally and keep it for the Figma checklist frame (A5).
+Run SKILL.md Steps 3–5 (analysis, pattern questions, checklist). If a chosen pattern (e.g. skeleton) has no component in the file or library, build it in A4 step 6 as `NEW` rather than swapping in a different existing pattern. Save `ui-states-checklist.md` locally and keep it for the Figma checklist frame (A5).
 
 ## A3. Plan the canvas
 
@@ -48,11 +49,13 @@ Order rows by category order in the taxonomy; within a row, P0 first.
 
 ## A4. Build each state
 
+**Re-running after new pattern answers:** clone the previous states section, keep cards whose pattern did not change (prefix their annotation with the decision), and rebuild only the changed ones from a fresh source clone. Keep the previous section for comparison.
+
 Work in small `use_figma` batches (a few states per call), returning created node ids so you can verify and continue. For each state:
 
 1. **Clone** the source frame: `const f = source.clone()`; append into the section row; rename. Cloning keeps the exact layout, auto layout, instances and variable bindings.
 2. **Change only the delta**, in this order of preference:
-   1. **Switch variant** on existing instances: `instance.setProperties({ State: 'Disabled' })` (use the exact property names read in A1).
+   1. **Switch variant** on existing instances: `instance.setProperties({ State: 'Disabled' })` (use the exact property names read in A1). If the component has no state variant, override its fills/text/icons with the library's state tokens (e.g. the "Disabled" fill/text/icon tokens). Never use layer opacity for a single component's state when tokens exist; a whole group/region being disabled follows the team's group rule (map or Step 4 answer), which may be opacity.
    2. **Swap instance** to another existing component (e.g. result card → existing empty-state component, button → loading button): `instance.swapComponent(component)`.
    3. **Insert existing components** imported from the library (`figma.importComponentByKeyAsync(key)` for library components; local components via their node): toast, banner, inline error, dialog, skeleton.
    4. **Edit text content** for copy (load fonts first: `await figma.loadFontAsync(textNode.fontName)`). Use placeholder copy in `{curly}` or `[brackets]` for unconfirmed rules.
@@ -64,6 +67,7 @@ Work in small `use_figma` batches (a few states per call), returning created nod
    - For overlays on top of an instance (thumbnail uploading/failed, scrims), add a frame as a direct child of the state frame, positioned from `absoluteBoundingBox` deltas, rather than modifying the instance.
    - In freshly cloned frames, locate nodes by walking `children` by name from the clone root; deep `findOne`/`findAllWithCriteria` on a new clone can miss nested instance children.
    - New text inside product UI clones an existing text node of the right role (keeps font/style), then binds its fill to a semantic text variable.
+   - For a NEW component (e.g. a Toast chosen in Step 4 that the library lacks), take colors from tokens already used by a similar surface in the source (a dark pill → the token of the active tab), not from token names — "Inverse" can resolve to white. Check the screenshot.
 5. **Annotate** for review and RD inspect:
    - Preferred: Dev Mode annotation on the frame (`frame.annotations = [{ label: 'Trigger: …\nExpected: …\nPriority: P0\nConfirm: PM — …' }]`) when the API is available.
    - Fallback / additionally: a small text block above the frame (not inside it) with ID, trigger, priority, confirmation flag. Keep annotation layers outside the state frame so Inspect shows only real UI.
@@ -77,7 +81,7 @@ Create `00 Checklist` at the start of the section: a table built with auto layou
 
 - `get_screenshot` each built frame (or the whole section at lower scale) and compare with the source screenshot: layout, spacing and typography unchanged outside the delta.
 - `get_metadata` on the source frame again — confirm it is unchanged (same child count / names).
-- Check no hard-coded colors were introduced where a variable exists (read `boundVariables` on new nodes in a read-only `use_figma` script).
+- Audit in a read-only `use_figma` script over every state frame: nodes with `opacity < 1` that the source does not have (except regions dimmed by the team's group-disabled rule), fills/strokes without `boundVariables`, and local components created in this run. Each must be either fixed (variant/token) or listed as `NEW` that the user confirmed.
 - Fix issues, then report: Figma link to the section (`https://www.figma.com/design/<fileKey>/?node-id=<sectionId>`), counts, open questions, new patterns, anything not built.
 
 ## Web input → Figma output
