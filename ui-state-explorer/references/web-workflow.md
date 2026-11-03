@@ -33,10 +33,11 @@ The explorer must drive the app's own state — not overwrite DOM. Pick the leas
 
 1. **App state setter / store** (best): expose it to the explorer in dev only, e.g.
    `if (import.meta.env.DEV) window.__APP_STATE__ = { set, reset, submit }`.
+   For a reducer, expose `dispatch` and wrap the product reducer with one dev-only patch action (`{ type: '__dev', patch }`) for states no action reaches. Timers that stand in for an engine get a dev-only hold switch, so a state can stay on processing and then finish through the real completion action.
    For plain-script prototypes, attach `window.__APP_STATE__` inside the explorer-include block (see B5) or have the app expose it only when `window.StateExplorer` exists.
 2. **Data layer stub**: `ctx.mockFetch()` or `ctx.stub(service, 'method', fn)` then trigger the real action. Good for loading/error/empty/partial states because the full real flow runs.
 3. **Injected dependencies**: props or options the app already accepts for data and services (catalog status, metadata readers, device/runtime adapters, submit handlers). Override them through a dev-only object that is empty in production, so the props are byte-identical outside dev.
-4. **The real flow with synthetic input**: dispatch files with valid headers into the real `<input type=file>`, combined with a fake metadata reader for durations/sizes, to reach import errors and limits without real media.
+4. **The real flow with synthetic input**: dispatch files with valid headers into the real `<input type=file>`, combined with a fake metadata reader for durations/sizes, to reach import errors and limits without real media. Also feed it bad input (a non-image, an unsupported type): the real handler shows whether the error state exists at all, or fails silently.
 5. **Static markup with no state model**: first refactor the region into `render(state)` with the original markup as the default output, then use seam 1.
 
 Interaction states (hover/focus/active) can't be forced by script. Implement them in CSS, and in the explorer add a state that applies a preview class (`ctx.addClass(el, 'is-hover')`) only if the CSS defines matching `.is-hover` rules alongside `:hover`; otherwise list them as "verify manually" in the checklist.
