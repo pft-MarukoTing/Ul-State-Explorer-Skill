@@ -27,3 +27,11 @@
 2. The team map caught a conflict that no Figma frame shows (group-disabled opacity). Checking the as-built UI against the map's rules is worth doing for every page.
 3. Driving the real input with bad data finds silent failures that reading the code misses. Added to B3 seam 4.
 4. Known issue: on phone width the explorer pill covers a fixed bottom-right button (here ✓ Apply). Not fixed yet.
+
+## Rerun: Step 4 was skipped the first time
+The user asked why the page was built without any questions. The first pass treated "RD already built it" as the answer, which breaks Step 4's "always ask". Fixed in the skill, then rerun:
+- **Decision log** (`design-system-map.md`): a team-owned table of family, decision, scope (`Product` / `Page`), source, who and when, status. Step 4 reads it plus other pages' checklists plus the as-built UI, and labels every option with its source — `(Decided — AI Auto Edit, 2026-11-02)`, `(Built today on this page)`. `Product` rows are applied without asking and listed first; the rest are recommendations. Answers are appended after the user confirms.
+- **The as-built UI is an option, not an answer** (`web-workflow.md` B1.7), and Step 7 checks that Step 4 ran before anything was built.
+- Two rounds, 6 questions (5 answered, 1 left as `default (unconfirmed)`). Two answers matched AI Auto Edit (delete confirm, bad upload → Toast), so both are now candidates to promote to `Product`.
+- Built from the answers: error Toast for a bad upload (the broken-tile bug is gone), cut-out failure (Toast, original photo kept, Upload Image still works), destructive delete confirm. 4 new strings are placeholders for PM.
+- Review fix: states that look exactly like the default (EMP-01 "section hidden", DIS-02) no longer appear as entries that change nothing; the runtime's `defaultCovers` lists them on DEF-00, and the checklist marks them `Covered by default`.

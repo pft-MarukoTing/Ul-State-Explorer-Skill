@@ -45,11 +45,25 @@ A map overrides search results. If the map and the library disagree (a mapped co
 | Selected | … | … |
 | Overlay / scrim | — | … |
 
-## Decided patterns (optional)
-Answers from earlier pattern questions that apply product-wide, e.g. "Validation: disabled + helper text, never click-then-error".
+## Pattern decisions log
+| Family | Decision | Scope | Source | Decided by · date | Status |
+|--------|----------|-------|--------|-------------------|--------|
+| F5 Action error — request failed | Toast (Alert Tone=Error), stay on page | Product | <page>, <checklist link> | <who> · <YYYY-MM-DD> | Decided |
+| F14 Validation | Disabled + visible helper text, never click-then-error | Product | … | … | Decided |
+| F9 Empty — first use | Illustration + CTA | Page: <page> | … | … | default (unconfirmed) |
 
 ## Known gaps
 Patterns the team has no component for yet, and what to do instead ("no Skeleton — use Spinner").
 ```
 
 Keep only what the team has decided. An empty row is better than a guessed one.
+
+## The decision log
+
+The log is how answers from one page reach the next. It lives in this team-owned file (in the project repo, so the team shares it and git keeps its history), never inside the skill and never only in one person's assistant memory.
+
+- **Family**: the pattern family from `pattern-questions.md` plus the state kind, so a later page can match it.
+- **Scope**: `Product` (applies to every page) or `Page: <name>` (decided for one page; a later page treats it as a recommendation, not an answer).
+- **Status**: `Decided`, `default (unconfirmed)` (the user took the recommended default) or `Superseded by <row>`. Never delete a row; supersede it.
+- The skill reads the log in Step 4 and appends to it after Step 4, with the user's confirmation of the rows and their scope. If the project has no map yet, the skill offers to create one holding just the log.
+

@@ -11,7 +11,7 @@ Deliverable: the existing web project/prototype with every missing state impleme
 5. If a Figma design is also provided as reference, read it per `figma-workflow.md` A1 for visual intent, but implement in the web project.
 
 6. Classify every state the taxonomy finds as **Implemented & reachable**, **Implemented but hard/impossible to reach** (needs many steps, real devices, failures the mocks never produce, data the fixtures don't have), or **Missing**. Mature or ported code is often mostly the second kind: then the work is reachability, not new UI.
-7. The existing implementation is guideline evidence. If it differs from an earlier pattern decision (e.g. a Figma run), do not change it to match — list the conflict in the checklist and ask. To help the team decide, offer to build both: the decided pattern goes behind a dev-only variant (a context or prop defaulting to the as-built design), and the state gets `variants: [{ id: 'rd', label: 'RD' }, { id: 'figma', label: 'Figma' }]` so the explorer shows a switch. Production keeps the as-built design until the team chooses.
+7. The existing implementation is guideline evidence, not an answer: it becomes the `(Built today on this page)` option in the Step 4 questions, which still run before anything is built, even when every state is already implemented. If it differs from an earlier pattern decision (the decision log, a Figma run), do not change it to match — list the conflict in the checklist and ask. To help the team decide, offer to build both: the decided pattern goes behind a dev-only variant (a context or prop defaulting to the as-built design), and the state gets `variants: [{ id: 'rd', label: 'RD' }, { id: 'figma', label: 'Figma' }]` so the explorer shows a switch. Production keeps the as-built design until the team chooses.
 8. Look for existing review tooling (a "Demo" / scenario / debug panel, query-string flags). Ask whether to fold it into the State Explorer so reviewers have one bottom-right entry; if removed, every option it had must become a state.
 9. If generated code is guarded (write hooks, "regenerate from sources" rules), follow the repo's workflow for product changes; in a throwaway test copy, say that edits are for testing only.
 
@@ -56,6 +56,7 @@ Explorer behavior (provided by the runtime, don't rebuild it):
 - Open → menu grouped by category, filterable, with ID, name, P0/P1/P2 badge and "?" badge for states needing confirmation; selecting shows trigger, expected UI and open question.
 - Selecting a state runs cleanup + `reset()` first, so states never stack.
 - States with `variants` show an A/B switch in the detail area; `apply(ctx)` reads `ctx.variant`, and `<html data-ui-variant>` is set for CSS or screenshots.
+- A state that renders exactly like the default (e.g. an empty section that is hidden until first use) is not its own entry — switching to it shows no change. List it in `defaultCovers: [{ id, name }]`; DEF-00's detail shows it, and the checklist marks it `Covered by default`. A state with variants is never covered this way, since one of its variants differs.
 - `DEF-00` returns to the original happy path; closing the panel (×, toggle, Esc) resets and returns to normal use.
 - Rendered in Shadow DOM, highest z-index; doesn't change product styles or focus order when closed.
 

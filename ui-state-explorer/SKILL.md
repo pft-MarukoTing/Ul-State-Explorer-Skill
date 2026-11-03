@@ -93,6 +93,13 @@ Never invent product rules (limits, quotas, plan names, retry counts, error copy
 
 The analysis says *which* states are missing; it cannot say *how* this team presents them. The same state has several common treatments — loading can be a skeleton, a spinner, a progress bar or a streaming result; an error can be a toast, an inline banner or a modal alert; long text can be clamped to 1–3 lines and revealed by a hover tooltip, an expand arrow or a "Read more" link; an empty state can have an illustration and/or a CTA to the next step. These are team decisions. **Always ask before building** — this step is not optional, even when the checklist is short.
 
+**First gather what is already known**, and show it in the questions:
+- the **decision log** in the team's Design System Map (`references/design-system-map.md`);
+- the **Pattern decisions** of other pages' `ui-states-checklist.md` in the same project;
+- how **this page is built today** (Mode B, or a Figma frame that already draws the state).
+
+None of these replaces the question, except a `Product`-scope `Decided` row, which is applied without asking and listed in one line before the questions ("Using earlier decisions: …") so the user can overrule it. The as-built UI is never an answer on its own: code that already exists is the recommended option, not the decision. Label every option with where it comes from — `(Decided — <page>, <date>)`, `(Built today on this page)`, `(Found in <library>)` — and when two sources disagree, show both and ask which wins.
+
 Follow `references/pattern-questions.md`:
 - Group the kept states into pattern families (F1–F20) and ask one question per family that is actually triggered — never one per state, never about families with no states.
 - Offer the common options for each family, not yes/no. Put the pattern found in the guideline first as `(Recommended — found in …)`; otherwise mark the most common practice as recommended.
@@ -101,6 +108,8 @@ Follow `references/pattern-questions.md`:
 - Ask in the user's language, using names from their screen.
 - Offer "use the recommended defaults for the rest"; record those as `default (unconfirmed)`.
 - For every chosen pattern with no component or token found, ask in the same round whether one exists (link) or it should be created as `NEW`. Never create `NEW` without that answer.
+
+After the answers, propose the new log rows (family, decision, scope `Product` or `Page`) and append them to the map once the user confirms; offer to create the map if there is none.
 
 Pattern questions do not replace product-rule questions (limits, plan names, copy) — those stay as `Needs confirmation` placeholders and can be asked in the same round if they are P0.
 
@@ -132,6 +141,7 @@ Show the checklist to the user before building when there are still open P0 ques
 Before reporting, check:
 - [ ] Every checklist item is built, or marked "Not built" with a reason.
 - [ ] Source happy path unchanged (Figma: source frame untouched; web: explorer off = original behavior, no console errors).
+- [ ] Step 4 ran before anything was built, and its answers are in the decision log (or the user declined).
 - [ ] Every state uses the pattern decided in Step 4 (no silent fallback to a different existing component).
 - [ ] Only existing tokens/components used, or `NEW` items flagged and confirmed by the user.
 - [ ] Audit of changed nodes: no raw opacity/colour where a state variant or token exists; list every remaining raw value and `NEW` item in the report.

@@ -2,7 +2,7 @@
 
 - Libraries: [Comp]YCO_web_components_2025 (components in other products' libraries — ycv, YCE, YCP… — are not YCO's guideline)
 - Library file: https://www.figma.com/design/JXNIQPJT9I9qFrgtiaCn4i/-Comp-YCO_web_components_2025
-- Updated: 2026-11-02 from Test A2 (AI Auto Edit) answers — fill in the empty links
+- Updated: 2026-11-03 — decision log added (rows from Test A2 / Test B, AI Auto Edit, and Test C, AI Background) — fill in the empty links
 
 ## Patterns
 | Pattern (family) | Use | Variant / props | Notes |
@@ -25,12 +25,25 @@
 | Hover / Pressed | Button, Thumbnail-media (Hover), Tag | Fill/Hover, Fill/Press |
 | Overlay / scrim | | Fill/Overlay, Fill/Overlay Weak |
 
-## Decided patterns (from AI Auto Edit, check before reusing on other pages)
-- After a generate action: switch to History; the generating card shows progress.
-- Requirements not met: disabled + persistent helper text, no click-then-error.
-- Import failed: file not added, Toast only.
-- Long single-line names: "…" + hover Tooltip.
-- Delete: confirm Modal.
+## Pattern decisions log
+| Family | Decision | Scope | Source | Decided by · date | Status |
+|--------|----------|-------|--------|-------------------|--------|
+| Disabled — whole group / region | Dim the whole region to 30% opacity | Product | Team rule, stated in Test A2 review | User · 2026-11-02 | Decided |
+| F5 Toast component | Alert, Tone=Error, Size=Small, Heading=off, top center | Product | Test A2 review | User · 2026-11-02 | Decided |
+| F4 Long task — after Generate | Switch to History; the generating card shows progress | Page: AI Auto Edit | Test A2 | User · 2026-11-02 | Decided |
+| F14 Validation — requirements not met | Disabled + persistent visible helper text, no click-then-error | Page: AI Auto Edit | Test A2 | User · 2026-11-02 | Decided (RD differs: reason screen-reader only — compare in Test B) |
+| F5 Action error — request failed | Toast, stay on page | Page: AI Auto Edit | Test A2 | User · 2026-11-02 | Decided (RD differs: nothing visible — compare in Test B) |
+| F5 Import failed | File not added, Toast only | Page: AI Auto Edit | Test A2 | User · 2026-11-02 | Decided |
+| F10 Text length — single-line names | "…" + hover Tooltip | Page: AI Auto Edit | Test A2 | User · 2026-11-02 | Decided |
+| F15 Delete | Confirm Modal (Tone=Destructive) | Page: AI Auto Edit | Test A2 | User · 2026-11-02 | Decided |
+| F5 Generation failed (task) | Text on the canvas + Retry on the preset tile; a creation retries from its menu (Regenerate) | Page: AI Background | Step 4, Test C | User · 2026-11-03 | Decided (kept as built) |
+| F5 Upload can't be used | Error Toast listing supported formats; file not added | Page: AI Background | Step 4, Test C (matches AI Auto Edit "Import failed") | User · 2026-11-03 | Decided |
+| F5 Cut-out failed / no subject | Error Toast; keep the original photo; editing off, Upload Image still works | Page: AI Background | Step 4, Test C | User · 2026-11-03 | Decided |
+| F15 Delete | Confirm Modal (Tone=Destructive); Undo still restores | Page: AI Background | Step 4, Test C (matches AI Auto Edit) | User · 2026-11-03 | Decided |
+| F9 Empty — section with no items yet | Hide the section until the first item (My Creations) | Page: AI Background | Step 4, Test C | User · 2026-11-03 | Decided (kept as built) |
+| F14 Input at its length limit | Input stops; counter shows 200/200 | Page: AI Background | Step 4, Test C — not answered | — · 2026-11-03 | default (unconfirmed) |
+
+Page-scope rows are recommendations for other pages, not answers; promote a row to `Product` when the team confirms it applies everywhere. Candidates: "Delete → confirm Modal" and "Upload/import can't be used → error Toast, file not added" were chosen the same way on both pages.
 
 ## Known gaps
 - No Skeleton component.

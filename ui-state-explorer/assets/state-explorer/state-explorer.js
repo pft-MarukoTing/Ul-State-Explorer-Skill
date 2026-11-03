@@ -15,6 +15,10 @@
  *     apply(ctx) { ...ctx.variant is the selected variant id... } }
  * The detail area shows a switch; the first variant is the default.
  *
+ * States that look exactly like the default are not separate entries (switching to them
+ * would show no change). List them on the default instead:
+ *   defaultCovers: [ { id: 'EMP-01', name: 'My Creations — none yet' } ]
+ *
  * Isolation: init() refuses to mount when
  *   - <html data-env="production">, or
  *   - window.__STATE_EXPLORER_DISABLED__ === true, or
@@ -247,7 +251,8 @@
       const q = filter.trim().toLowerCase();
       const matches = (s) => !q || [s.id, s.name, categoryOf(s), s.trigger].join(' ').toLowerCase().includes(q);
 
-      const def = { id: 'DEF-00', name: 'Default (original happy path)', category: 'Default' };
+      const covers = opts.defaultCovers || [];
+      const def = { id: 'DEF-00', name: 'Default (original happy path)', category: 'Default', trigger: covers.map((c) => c.id + ' ' + c.name).join(' ') };
       const all = [def].concat(opts.states).filter(matches);
       const groups = {};
       all.forEach((s) => { (groups[categoryOf(s)] ||= []).push(s); });
@@ -302,6 +307,12 @@
     const s = opts.states.find((x) => x.id === activeId);
     if (!s) {
       box.appendChild(el('div', { text: 'Showing the original default state. Pick a state to preview it; close the panel to return to normal use.' }));
+      const covers = opts.defaultCovers || [];
+      if (covers.length) {
+        const dl = el('dl', { style: 'margin:8px 0 0' }, [el('dt', { text: 'This default also shows' })]);
+        covers.forEach((c) => dl.appendChild(el('dd', { text: c.id + ' \u2014 ' + c.name })));
+        box.appendChild(dl);
+      }
       return;
     }
     const variant = s.variants ? s.variants.find((v) => v.id === activeVariant) : null;

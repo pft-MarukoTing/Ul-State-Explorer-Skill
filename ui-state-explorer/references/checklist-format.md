@@ -61,10 +61,10 @@ One checklist per analysed screen (or one per flow with a section per screen). T
 - **Trigger** — an observable condition ("upload > {maxSize}", "API returns 5xx", "list has 0 items after filter"), never vague ("when something goes wrong").
 - **Pattern** — the family ID from `pattern-questions.md` whose decision this state follows (`—` if no family applies).
 - **Expected UI** — the delta from default only, following the decided pattern.
-- **Pattern decisions → Source** — `User` (answered in Step 4), `Guideline` (found in the design system and confirmed), or `default (unconfirmed)` (user chose "use recommended defaults").
+- **Pattern decisions → Source** — `User` (answered in Step 4), `Guideline` (found in the design system and confirmed), `Log (<page>, <date>)` (a `Product`-scope row of the decision log, applied without asking), or `default (unconfirmed)` (user chose "use recommended defaults").
 - **Reuse** — component/variant/token names from the design system, or `NEW`.
 - **Confirm** — `—`, `PM`, `RD`, or `PM+RD` followed by the specific question.
-- **Status** — `Built`, `Built (placeholder copy)`, `Not built`, `Covered`.
+- **Status** — `Built`, `Built (placeholder copy)`, `Not built`, `Covered`, `Covered by default` (looks exactly like the default page; listed on DEF-00, not as its own explorer entry).
 
 ## Priority definitions
 
