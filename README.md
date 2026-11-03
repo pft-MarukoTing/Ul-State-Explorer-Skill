@@ -13,7 +13,7 @@
 - Error：Toast／區塊內 Inline banner＋Retry／Alert dialog／按鈕下方文字
 - 文字長度：Title / Description 各幾行，超出用 hover tooltip、展開箭頭（Show more）、Read more 還是漸層遮罩
 - Empty：插圖／Icon／純文字，是否加 CTA 引導下一步
-- 以及表單驗證時機、上傳失敗、Disabled 原因、刪除確認 vs Undo、權限/額度、數字縮寫等共 20 類
+- 以及表單驗證時機、上傳失敗、Disabled 原因、刪除確認 vs Undo、權限/額度、數字縮寫等共 19 類
 
 設計系統裡已有的元件會標成「Recommended」；不想逐一回答時可選「其餘用建議預設」，這些項目會在 Checklist 標為 `default (unconfirmed)` 供 Review。
 
@@ -43,8 +43,8 @@ Mode A 需要已連線的 Figma MCP server（含 `use_figma` 寫入能力）。
 ui-state-explorer/
 ├── SKILL.md                         # 主流程：模式判斷、盤點、分析、詢問呈現方式、設計原則、驗證
 ├── references/
-│   ├── state-taxonomy.md            # 13 類狀態的偵測問題與預期 UI
-│   ├── pattern-questions.md         # 20 類呈現方式（Pattern）的常見做法、找元件的方法與提問方式
+│   ├── state-taxonomy.md            # 12 類狀態的偵測問題與預期 UI
+│   ├── pattern-questions.md         # 19 類呈現方式（Pattern）的常見做法、找元件的方法與提問方式
 │   ├── design-system-map.md         # 團隊自己的元件／Token 對照表格式（放在各團隊專案，不放進 skill）
 │   ├── checklist-format.md          # Missing State Checklist 格式、優先級定義、JSON schema
 │   ├── figma-workflow.md            # Mode A 工作流程
