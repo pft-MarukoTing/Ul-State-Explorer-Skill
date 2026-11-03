@@ -31,12 +31,12 @@
 
   const CATEGORY_ORDER = [
     'Default', 'Empty', 'Loading', 'Error', 'Disabled', 'Validation', 'Interaction',
-    'Edge', 'Permission', 'Responsive', 'Partial', 'Destructive', 'Business',
+    'Edge', 'Permission', 'Partial', 'Destructive', 'Business',
   ];
   const CATEGORY_ALIASES = {
     DEF: 'Default', EMP: 'Empty', LOAD: 'Loading', ERR: 'Error', DIS: 'Disabled',
     VAL: 'Validation', INT: 'Interaction', EDGE: 'Edge', PERM: 'Permission',
-    RESP: 'Responsive', PART: 'Partial', DEST: 'Destructive', BIZ: 'Business',
+    PART: 'Partial', DEST: 'Destructive', BIZ: 'Business',
   };
 
   let opts = null;

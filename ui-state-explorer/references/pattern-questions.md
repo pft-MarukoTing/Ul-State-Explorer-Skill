@@ -178,7 +178,7 @@ Each family: when to ask · the question · common options · follow-ups (ask on
 
 **Follow-ups:** illustration exists in the library or is NEW? Copy owner (PM / UX writer)?
 
-### F10. Text length / overflow — `EDGE` `RESP`
+### F10. Text length / overflow — `EDGE`
 **Ask when:** any user- or server-provided text: titles, descriptions, names, filenames, labels in buttons/chips/tabs, table cells. Ask **per text role**, not once for everything.
 **Question A — max lines** (per role, e.g. title / description / card subtitle):
 - 1 line
@@ -269,12 +269,6 @@ Each family: when to ask · the question · common options · follow-ups (ask on
 - Hover: lift (shadow) / border highlight / background tint / overlay with quick actions
 - Selected: check badge in corner / thick brand border / filled background
 - Multi-select: checkbox always visible / appears on hover / long-press on touch + bulk action bar
-
-### F20. Responsive overflow — `RESP`
-**Ask when:** the product targets narrow viewports and has wide regions.
-- Tables: horizontal scroll / stack into cards / hide low-priority columns
-- Toolbars / tabs: overflow "More" menu / horizontal scroll / wrap
-- Side panels: collapse to drawer / bottom sheet / stacked below
 
 ---
 

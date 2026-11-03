@@ -56,7 +56,7 @@ One checklist per analysed screen (or one per flow with a section per screen). T
 
 ## Column rules
 
-- **ID** — `<CODE>-<nn>`; codes: `DEF EMP LOAD ERR DIS VAL INT EDGE PERM RESP PART DEST BIZ`. `DEF-00` is always the untouched original.
+- **ID** — `<CODE>-<nn>`; codes: `DEF EMP LOAD ERR DIS VAL INT EDGE PERM PART DEST BIZ`. `DEF-00` is always the untouched original.
 - **State name** — `<Region> — <condition>`; no generic names like "Error".
 - **Trigger** — an observable condition ("upload > {maxSize}", "API returns 5xx", "list has 0 items after filter"), never vague ("when something goes wrong").
 - **Pattern** — the family ID from `pattern-questions.md` whose decision this state follows (`—` if no family applies).

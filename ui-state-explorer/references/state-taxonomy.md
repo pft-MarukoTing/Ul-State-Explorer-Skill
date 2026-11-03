@@ -56,25 +56,19 @@ Each category lists: code (used in state IDs), detection questions, typical expe
 **Typical UI:** locked badge on the control, upsell or request-access prompt using existing dialog/banner, view-only variant with editing controls hidden or disabled.
 **Confirm:** always PM — plan names, which features are gated, upgrade destination, quota numbers. Use placeholders.
 
-## 10. Responsive / Overflow — `RESP`
-**Detect:** Target breakpoints in the source (frame width, CSS breakpoints). Regions that can overflow: toolbars, tab bars, button groups, tables, long titles, chip lists, side panels.
-**States:** narrow/mobile layout of the screen (only if the product targets it), content overflow (scroll, wrap, "More" menu), extreme zoom/large text.
-**Typical UI:** reuse existing responsive patterns; do not invent a new mobile layout if the product has no mobile guideline — flag instead.
-**Confirm:** supported breakpoints, whether mobile is in scope.
-
-## 11. Partial Success / Retry — `PART`
+## 10. Partial Success / Retry — `PART`
 **Detect:** Batch actions (multi-upload, bulk edit, batch generate, multi-recipient send), multi-step processes, results composed of several independent parts.
 **States:** some items succeeded and some failed, per-item retry, retry all failed, resumed after interruption.
 **Typical UI:** per-item status (success / failed / pending) in existing list rows, summary line "8 of 10 done", retry actions.
 **Confirm:** whether partial results are saved, retry limits.
 
-## 12. Destructive / Recovery — `DEST`
+## 11. Destructive / Recovery — `DEST`
 **Detect:** Delete, remove, reset, discard, overwrite, clear, leave-with-unsaved-changes, cancel long task, sign out of unsaved work.
 **States:** confirmation dialog, undo toast after action, unsaved-changes warning, restored state after undo, irreversible warning.
 **Typical UI:** existing dialog component with destructive button variant; undo toast.
 **Confirm:** whether undo is supported (soft delete) vs. confirm-only.
 
-## 13. Business-specific — `BIZ`
+## 12. Business-specific — `BIZ`
 **Detect:** Rules visible in the UI that are unique to this product: e.g. a credit cost on a button, a processing queue, a review/approval step, content-moderation, region/locale restrictions, a version or draft status, expiring links, model/engine selection. Derive only from what the source shows or what the user stated.
 **Typical UI:** composed from existing components.
 **Confirm:** nearly always PM. Never assume the rule — describe the state and ask.
@@ -83,5 +77,5 @@ Each category lists: code (used in state IDs), detection questions, typical expe
 
 ## Priority guide (summary — full definitions in `checklist-format.md`)
 - **P0** — user is blocked or loses data without it (load/action error, required validation, empty first use of the main area, loading of the main action, destructive confirmation).
-- **P1** — common and confusing without it (disabled reasons, no-results, permission, partial success, overflow of key content).
+- **P1** — common and confusing without it (disabled reasons, no-results, permission, partial success, long text in key places).
 - **P2** — polish / rare (hover detail, extreme edge values, rare errors).

@@ -57,15 +57,6 @@
         priority: 'P0',
         apply: () => app.set({ history: [] }),
       },
-      {
-        id: 'RESP-01',
-        category: 'Responsive',
-        name: 'Toolbar — narrow width',
-        trigger: 'Viewport < 600px',
-        expected: 'Secondary actions collapse into More menu',
-        priority: 'P1',
-        apply: (ctx) => ctx.note('Resize the window below 600px to preview this state.'),
-      },
     ],
   });
 })();

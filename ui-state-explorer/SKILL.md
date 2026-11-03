@@ -1,6 +1,6 @@
 ---
 name: ui-state-explorer
-description: Find and build the UI states a design is missing beyond the happy path — loading, empty, error, disabled, validation, interaction, edge cases, permission, responsive, retry, destructive and business-specific states. Asks the user which presentation pattern the team uses for each state family (skeleton vs spinner, toast vs alert dialog, text clamp lines and tooltip vs expand, empty-state illustration and CTA…), produces a Missing State Checklist, then delivers the states either as editable Figma frames (Mode A) or as a State Explorer toggle inside a web prototype (Mode B). Use when the user asks to "fill in missing states", "add loading/empty/error states", "what states am I missing", "state coverage", "edge cases for this screen", "UI states for RD handoff", "state explorer", or shares a Figma frame or web page and wants non-happy-path states designed or implemented.
+description: Find and build the UI states a design is missing beyond the happy path — loading, empty, error, disabled, validation, interaction, edge cases, permission, retry, destructive and business-specific states (responsive layouts are a separate skill). Asks the user which presentation pattern the team uses for each state family (skeleton vs spinner, toast vs alert dialog, text clamp lines and tooltip vs expand, empty-state illustration and CTA…), produces a Missing State Checklist, then delivers the states either as editable Figma frames (Mode A) or as a State Explorer toggle inside a web prototype (Mode B). Use when the user asks to "fill in missing states", "add loading/empty/error states", "what states am I missing", "state coverage", "edge cases for this screen", "UI states for RD handoff", "state explorer", or shares a Figma frame or web page and wants non-happy-path states designed or implemented.
 ---
 
 # UI State Explorer
@@ -68,10 +68,11 @@ Categories:
 7. Hover / Focus / Active / Selected
 8. Boundary / Edge Cases
 9. Permission / Subscription
-10. Responsive / Overflow
-11. Partial Success / Retry
-12. Destructive / Recovery
-13. Business-specific states (derived from this product's own rules visible in the UI)
+10. Partial Success / Retry
+11. Destructive / Recovery
+12. Business-specific states (derived from this product's own rules visible in the UI)
+
+Out of scope: responsive layouts (breakpoints, mobile layouts, toolbars or tables collapsing at narrow widths) belong to a separate skill. Text that is too long for its box is still covered, under Boundary / Edge Cases.
 
 For every kept state, define:
 - **ID** — `<category-code>-<nn>` (e.g. `LOAD-01`), stable across both modes.
@@ -101,7 +102,7 @@ The analysis says *which* states are missing; it cannot say *how* this team pres
 None of these replaces the question, except a `Product`-scope `Decided` row, which is applied without asking and listed in one line before the questions ("Using earlier decisions: …") so the user can overrule it. The as-built UI is never an answer on its own: code that already exists is the recommended option, not the decision. Label every option with where it comes from — `(Decided — <page>, <date>)`, `(Built today on this page)`, `(Found in <library>)` — and when two sources disagree, show both and ask which wins.
 
 Follow `references/pattern-questions.md`:
-- Group the kept states into pattern families (F1–F20) and ask one question per family that is actually triggered — never one per state, never about families with no states.
+- Group the kept states into pattern families (F1–F19) and ask one question per family that is actually triggered — never one per state, never about families with no states.
 - Offer the common options for each family, not yes/no. Put the pattern found in the guideline first as `(Recommended — found in …)`; otherwise mark the most common practice as recommended.
 - Ask text-length questions per text role (title, description, filename, button label): max lines **and** how the rest is revealed.
 - Use the `AskUserQuestion` tool when available (≤ 4 questions per call, P0 families first, ≤ 3 rounds); otherwise send one numbered message the user can answer in shorthand.

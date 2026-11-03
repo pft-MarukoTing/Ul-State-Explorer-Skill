@@ -42,8 +42,6 @@ The explorer must drive the app's own state — not overwrite DOM. Pick the leas
 
 Interaction states (hover/focus/active) can't be forced by script. Implement them in CSS, and in the explorer add a state that applies a preview class (`ctx.addClass(el, 'is-hover')`) only if the CSS defines matching `.is-hover` rules alongside `:hover`; otherwise list them as "verify manually" in the checklist.
 
-Responsive states depend on the real viewport: use `ctx.note('Resize below …px')`, or if the app uses container queries, constrain the container with a preview class.
-
 ## B4. Add the State Explorer
 
 1. Copy `assets/state-explorer/state-explorer.js` to `<project>/state-explorer/state-explorer.js` unchanged.
