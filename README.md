@@ -56,6 +56,7 @@ examples/
 ├── design-system-maps/              # 對照表範例（YCO），不會隨 skill 安裝
 ├── test-a-figma/                    # Test A：Figma Tool Page 實測結果
 ├── test-a2-pattern-questions/       # Test A2：加上呈現方式提問後重跑
+├── test-a3-figma-mobile/            # Test A3：同一頁面的手機版 Figma
 ├── test-b-web/                      # Test B：網頁版（auto-edit）
 └── test-c-web-ai-background/        # Test C：網頁版（ai-background）
 ```
@@ -66,5 +67,6 @@ examples/
 |------|------|------|
 | Test A — Figma Tool Page（AI Auto Edit） | A | ✅ 14 個缺少狀態建立為 Figma Frames，9 個既有狀態標為 Covered，原 Frame 未變動 — 見 [examples/test-a-figma](examples/test-a-figma) |
 | Test A2 — 同一頁面＋呈現方式提問 | A | ✅ 3 輪 12 題，6 題答案與推薦不同；5 個狀態依回答重做／新增、移除 VAL-01、新增 NEW Toast — 見 [examples/test-a2-pattern-questions](examples/test-a2-pattern-questions) |
+| Test A3 — 同一頁面的手機版 Figma | A | ✅ 沿用已決定的做法不再問，只問 4 題手機才有的（沒有 hover、彈窗裡刪除等）；12 個狀態建立為手機 Frames，2 個原稿已涵蓋，History 畫面因手機版沒有設計未建 — 見 [examples/test-a3-figma-mobile](examples/test-a3-figma-mobile) |
 | Test B — yco-collab-space auto-edit（同一頁面的網頁版） | B | ✅ 右下角 State Explorer 收 29 個狀態、逐一在瀏覽器驗證；狀態本身 RD 都已實作，主要補「到得了」；與 Figma 決定有 4 處衝突待決定 — 見 [examples/test-b-web](examples/test-b-web) |
 | Test C — yco-collab-space ai-background | B | ✅ 29 個狀態收進 State Explorer、逐一驗證；對照表抓到 1 處與團隊規則衝突（停用區塊 60% vs 30%，已做切換）；發現 1 個無提示的上傳錯誤；3 個缺少狀態待決定呈現方式 — 見 [examples/test-c-web-ai-background](examples/test-c-web-ai-background) |

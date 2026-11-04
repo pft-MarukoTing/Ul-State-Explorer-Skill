@@ -2,7 +2,7 @@
 
 - Libraries: [Comp]YCO_web_components_2025 (components in other products' libraries — ycv, YCE, YCP… — are not YCO's guideline)
 - Library file: https://www.figma.com/design/JXNIQPJT9I9qFrgtiaCn4i/-Comp-YCO_web_components_2025
-- Updated: 2026-11-03 — decision log added (rows from Test A2 / Test B, AI Auto Edit, and Test C, AI Background) — fill in the empty links
+- Updated: 2026-11-03 — decision log added (rows from Test A2 / Test B, AI Auto Edit, Test C, AI Background, and Test A3, AI Auto Edit mobile) — fill in the empty links
 
 ## Patterns
 | Pattern (family) | Use | Variant / props | Notes |
@@ -42,8 +42,12 @@
 | F15 Delete | Confirm Modal (Tone=Destructive); Undo still restores | Page: AI Background | Step 4, Test C (matches AI Auto Edit) | User · 2026-11-03 | Decided |
 | F9 Empty — section with no items yet | Hide the section until the first item (My Creations) | Page: AI Background | Step 4, Test C | User · 2026-11-03 | Decided (kept as built) |
 | F14 Input at its length limit | Input stops; counter shows 200/200 | Page: AI Background | Step 4, Test C — not answered | — · 2026-11-03 | default (unconfirmed) |
+| F10 Text length — names on touch (no hover) | 1 line + "…"; tap opens the detail (Voice-Over Style) with the full name | Page: AI Auto Edit (mobile) | Step 4, Test A3 | User · 2026-11-03 | Decided |
+| F15 Delete inside a modal | Stack a confirm Modal (Tone=Destructive, Device=Mobile) on top | Page: AI Auto Edit (mobile) | Step 4, Test A3 (matches desktop delete) | User · 2026-11-03 | Decided |
+| F9 Empty — My Voices | One line of text; the existing Record / Import buttons stay below | Page: AI Auto Edit (mobile) | Step 4, Test A3 | User · 2026-11-03 | Decided (kept as built) |
+| F4 / F5 Creating a voice | Row Spinner; on failure the row shows an error line + Retry | Page: AI Auto Edit (mobile) | Step 4, Test A3 | User · 2026-11-03 | Decided |
 
-Page-scope rows are recommendations for other pages, not answers; promote a row to `Product` when the team confirms it applies everywhere. Candidates: "Delete → confirm Modal" and "Upload/import can't be used → error Toast, file not added" were chosen the same way on both pages.
+Page-scope rows are recommendations for other pages, not answers; promote a row to `Product` when the team confirms it applies everywhere. Candidates: "Delete → confirm Modal" (now chosen on three pages, including inside a modal on mobile) and "Upload/import can't be used → error Toast, file not added" were chosen the same way on both pages.
 
 ## Known gaps
 - No Skeleton component.
