@@ -19,14 +19,34 @@
 
 ## 安裝
 
-**Claude Code**
+**Claude Code**（用連結安裝，之後更新只要 `git pull`）
 
 ```bash
-git clone https://github.com/pft-MarukoTing/Ul-State-Explorer-Skill.git
-cp -R Ul-State-Explorer-Skill/ui-state-explorer ~/.claude/skills/
+git clone https://github.com/pft-MarukoTing/Ul-State-Explorer-Skill.git ~/Ul-State-Explorer-Skill
+ln -s ~/Ul-State-Explorer-Skill/ui-state-explorer ~/.claude/skills/ui-state-explorer
 ```
 
 **claude.ai**：將 `ui-state-explorer/` 資料夾壓縮成 zip，在 claude.ai 的 Skills 設定中上傳。
+
+## 更新
+
+**Claude Code**（連結安裝）：
+
+```bash
+git -C ~/Ul-State-Explorer-Skill pull
+```
+
+如果當初是用 `cp -R` 複製安裝，請先刪掉舊的資料夾再改成連結：
+
+```bash
+rm -rf ~/.claude/skills/ui-state-explorer
+ln -s ~/Ul-State-Explorer-Skill/ui-state-explorer ~/.claude/skills/ui-state-explorer
+```
+
+**claude.ai**：在 Skills 設定中刪除舊版，重新上傳新的 zip。
+
+- 更新後要開新的 session 才會用到新版；已開著的 session 仍是舊版。
+- 團隊的對照表與決策紀錄（例如 `design-system-map.md`）放在各自專案，不在 skill 資料夾內，更新不會覆蓋。
 
 ## 使用方式
 
