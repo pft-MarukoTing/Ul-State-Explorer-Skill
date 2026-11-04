@@ -44,7 +44,7 @@ Recommendations are only as good as this search. Most "NEW" components in past r
 5. **Ask in rounds, P0 families first.** With the `AskUserQuestion` tool: ≤ 4 questions per call, ≤ 4 options each, ≤ 3 rounds. Without it: one numbered message, grouped by family, each option lettered, so the user can answer `1b, 2a+c, 3 default`.
 6. **Ask in the user's language** and use concrete examples from *their* screen ("Result area while generating", not "loading region").
 7. **Always offer an escape hatch**: "Use the recommended defaults for the rest". Defaults chosen this way are recorded as `default (unconfirmed)` in the checklist so review can catch them.
-8. **Never re-ask** a decision already answered in this conversation, in the user's request, or as a `Product`-scope `Decided` row in the decision log — apply it and list it in one line so the user can overrule it. A `Page`-scope row from another page, another page's checklist, or the as-built UI is a labelled option, not an answer: `(Decided — auto-edit, 2026-11-02)`, `(Built today on this page)`. When they disagree, show both.
+8. **Never re-ask** a decision already answered in this conversation, in the user's request, or as a `Product`-scope `Decided` row in the decision log — apply it and list it in one line so the user can overrule it. A `Page`-scope row from another page, another page's checklist, or the as-built UI is a labelled option, not an answer: `(Decided — auto-edit, 2026-11-02)`, `(Built today on this page)`. When they disagree, show both. List **every** page that decided the option (search all `Decided` rows and earlier checklists for the same family and pattern; desktop and mobile count as separate pages): `(Decided on 3 pages)` in the label, and the pages with dates in the description, so the user can see how widely it is already used.
 9. **Evidence comes only from libraries the source uses.** A design-system search may return components from other products' libraries. Count something as "found in the guideline" only if it is in a library already used by the source frame/page (read from its instances); otherwise the pattern is `NEW`.
 10. **Resolve multi-select answers.** If the user picks several options for a family that covers different states (e.g. errors: toast + inline alert + failed card), follow up in the next round with one question per state type — "Generate request failed → which?", "Import failed → which?" — so every state maps to exactly one pattern.
 11. **Check decisions against each other before building.** Some answers interact: "after Generate, jump to History" + "request failed → toast, stay on page" raises *when* the jump happens. Mutually exclusive answers (disabled-with-reason vs click-then-validate) remove states from the checklist. Ask about real conflicts in the last round; list the rest under Open questions.
@@ -57,7 +57,7 @@ Before I build the 14 states, a few pattern choices for this screen:
 
 1. Result area while generating (LOAD-01, LOAD-02)
    a) Skeleton of the result card  ← recommended, Skeleton exists in the library
-   (Decided — Search page, 2026-10-12: skeleton; Built today on this page: spinner)
+   (Decided on 2 pages: Search 2026-10-12 · Library 2026-10-20 — skeleton; Built today on this page: spinner)
    b) Centered spinner
    c) Progress bar with % + Cancel
    d) Blurred placeholder that sharpens as it streams in
