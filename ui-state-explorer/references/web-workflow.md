@@ -50,7 +50,7 @@ Interaction states (hover/focus/active) can't be forced by script. Implement the
 4. Each `apply(ctx)` sets state through the seam and may use `ctx.mockFetch / ctx.stub / ctx.addClass / ctx.onCleanup` — all automatically undone when leaving the state. Never write fixtures to `localStorage`, cookies or a real backend.
 
 Explorer behavior (provided by the runtime, don't rebuild it):
-- Toggle button fixed bottom-right ("States"), keyboard shortcut Alt+Shift+S.
+- Toggle button ("States"), bottom-right by default, keyboard shortcut Alt+Shift+S. Reviewers can drag it anywhere (mouse or touch) when it covers product UI; the position is remembered per site and "Reset position" in the panel header puts it back. The panel opens toward the middle of the screen from wherever the button sits.
 - Open → menu grouped by category, filterable, with ID, name, P0/P1/P2 badge and "?" badge for states needing confirmation; selecting shows trigger, expected UI and open question.
 - Selecting a state runs cleanup + `reset()` first, so states never stack.
 - States with `variants` show an A/B switch in the detail area; `apply(ctx)` reads `ctx.variant`, and `<html data-ui-variant>` is set for CSS or screenshots.

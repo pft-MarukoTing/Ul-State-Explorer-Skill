@@ -19,6 +19,9 @@
  * would show no change). List them on the default instead:
  *   defaultCovers: [ { id: 'EMP-01', name: 'My Creations — none yet' } ]
  *
+ * The "States" pill can be dragged anywhere (mouse or touch). Its position is kept per
+ * site in localStorage; "Reset position" in the panel header puts it back in the bottom-right corner.
+ *
  * Isolation: init() refuses to mount when
  *   - <html data-env="production">, or
  *   - window.__STATE_EXPLORER_DISABLED__ === true, or
@@ -48,6 +51,10 @@
   let cleanups = [];
   let applying = Promise.resolve();
   let noteText = '';
+  let pos = null;            // pill top-left {x, y} in px; null = default bottom-right corner
+  let suppressClick = false; // set after a drag so the pointer-up does not toggle the panel
+  const POS_KEY = 'state-explorer:pos';
+  const EDGE = 8;
 
   function categoryOf(s) {
     if (s.category) return CATEGORY_ALIASES[s.category] || s.category;
@@ -172,9 +179,10 @@
     :host { all: initial; }
     * { box-sizing: border-box; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
     .wrap { position: fixed; right: 16px; bottom: 16px; z-index: 2147483647; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-    .toggle { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 999px;
-      border: 1px solid #3a3a44; background: #18181c; color: #f4f4f6; font-size: 13px; font-weight: 600; cursor: pointer;
+    .toggle { touch-action: none; user-select: none; -webkit-user-select: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 999px;
+      border: 1px solid #3a3a44; background: #18181c; color: #f4f4f6; font-size: 13px; font-weight: 600; cursor: grab;
       box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+    .toggle.dragging { cursor: grabbing; }
     .toggle:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid #7aa7ff; outline-offset: 2px; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #6b6b76; }
     .toggle[aria-pressed="true"] .dot { background: #4ade80; }
@@ -185,6 +193,9 @@
     .head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid #2c2c34; }
     .head strong { font-size: 13px; }
     .head small { color: #9a9aa6; display: block; margin-top: 2px; font-size: 11px; }
+    .head-actions { display: flex; align-items: center; gap: 4px; }
+    .reset-pos { background: none; border: 1px solid #34343d; color: #c9c9d1; font-size: 11px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+    .reset-pos:hover { color: #fff; background: #26262d; }
     .x { background: none; border: 0; color: #9a9aa6; font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
     .x:hover { color: #fff; background: #26262d; }
     .search { margin: 10px 14px 4px; padding: 8px 10px; border-radius: 8px; border: 1px solid #34343d; background: #101013; color: #ececf1; font-size: 13px; width: calc(100% - 28px); }
@@ -238,7 +249,11 @@
           el('strong', { text: 'State Explorer' }),
           el('small', { text: (opts.title ? opts.title + ' \u00b7 ' : '') + opts.states.length + ' states \u00b7 preview only' }),
         ]),
-        el('button', { class: 'x', 'aria-label': 'Close State Explorer and return to normal mode', onclick: close, text: '\u00d7' }),
+        el('div', { class: 'head-actions' }, [
+          pos ? el('button', { class: 'reset-pos', title: 'Move the States button back to the bottom-right corner',
+            onclick: () => { pos = null; savePos(); render(); }, text: 'Reset position' }) : null,
+          el('button', { class: 'x', 'aria-label': 'Close State Explorer and return to normal mode', onclick: close, text: '\u00d7' }),
+        ]),
       ]));
       const search = el('input', {
         class: 'search', type: 'search', placeholder: 'Filter by ID, name, category\u2026', 'aria-label': 'Filter states',
@@ -289,16 +304,91 @@
     wrap.appendChild(el('button', {
       class: 'toggle', 'aria-pressed': isOpen ? 'true' : 'false',
       'aria-label': isOpen ? 'Close State Explorer' : 'Open State Explorer',
-      title: 'State Explorer (Alt+Shift+S)',
-      onclick: () => (isOpen ? close() : open()),
+      title: 'State Explorer (Alt+Shift+S) \u00b7 drag to move',
+      onclick: () => {
+        if (suppressClick) { suppressClick = false; return; }
+        isOpen ? close() : open();
+      },
+      onpointerdown: startDrag,
     }, [
       el('span', { class: 'dot' }),
       el('span', { text: 'States' }),
       isOpen && active ? el('span', { class: 'active-chip', text: active.id }) : null,
     ]));
     root.appendChild(wrap);
+    placeWrap();
     renderDetail();
   }
+
+  // ---- dragging the pill ----------------------------------------------------
+  function loadPos() {
+    try {
+      const v = JSON.parse(localStorage.getItem(POS_KEY) || 'null');
+      return v && Number.isFinite(v.x) && Number.isFinite(v.y) ? v : null;
+    } catch (e) { return null; }
+  }
+
+  function savePos() {
+    try {
+      if (pos) localStorage.setItem(POS_KEY, JSON.stringify(pos));
+      else localStorage.removeItem(POS_KEY);
+    } catch (e) { /* storage blocked: position lasts until reload */ }
+  }
+
+  function clampPos(p, w, h) {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    return {
+      x: Math.min(Math.max(EDGE, p.x), Math.max(EDGE, vw - w - EDGE)),
+      y: Math.min(Math.max(EDGE, p.y), Math.max(EDGE, vh - h - EDGE)),
+    };
+  }
+
+  /** Anchor the wrap to the pill's nearest corner so the panel opens toward the middle of the screen. */
+  function placeWrap() {
+    const wrap = root && root.querySelector('.wrap');
+    const pill = root && root.querySelector('.toggle');
+    if (!wrap || !pill) return;
+    const st = wrap.style;
+    st.left = st.right = st.top = st.bottom = st.flexDirection = st.alignItems = '';
+    if (!pos) return; // CSS default: bottom-right, panel above
+    const w = pill.offsetWidth, h = pill.offsetHeight;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    pos = clampPos(pos, w, h);
+    // Set every side explicitly: the CSS default (right/bottom 16px) would otherwise stretch the wrap.
+    if (pos.x + w / 2 < vw / 2) { st.left = pos.x + 'px'; st.right = 'auto'; st.alignItems = 'flex-start'; }
+    else { st.right = (vw - pos.x - w) + 'px'; st.left = 'auto'; st.alignItems = 'flex-end'; }
+    if (pos.y + h / 2 < vh / 2) { st.top = pos.y + 'px'; st.bottom = 'auto'; st.flexDirection = 'column-reverse'; }
+    else { st.bottom = (vh - pos.y - h) + 'px'; st.top = 'auto'; st.flexDirection = 'column'; }
+  }
+
+  function startDrag(e) {
+    if (e.button !== 0) return;
+    const pill = e.currentTarget;
+    const r = pill.getBoundingClientRect();
+    const startX = e.clientX, startY = e.clientY;
+    let moved = false;
+    pill.setPointerCapture(e.pointerId);
+    const move = (ev) => {
+      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (!moved && Math.hypot(dx, dy) < 4) return; // a small wobble is still a click
+      moved = true;
+      pill.classList.add('dragging');
+      pos = { x: r.left + dx, y: r.top + dy };
+      placeWrap();
+    };
+    const up = () => {
+      pill.removeEventListener('pointermove', move);
+      pill.removeEventListener('pointerup', up);
+      pill.removeEventListener('pointercancel', up);
+      pill.classList.remove('dragging');
+      if (moved) { suppressClick = true; savePos(); setTimeout(() => { suppressClick = false; }, 0); }
+    };
+    pill.addEventListener('pointermove', move);
+    pill.addEventListener('pointerup', up);
+    pill.addEventListener('pointercancel', up);
+  }
+
+  function onResize() { placeWrap(); }
 
   function renderDetail() {
     const box = root && root.querySelector('.detail');
@@ -354,6 +444,8 @@
       root = host.attachShadow({ mode: 'open' });
       document.body.appendChild(host);
       document.addEventListener('keydown', onKey, true);
+      window.addEventListener('resize', onResize);
+      pos = loadPos();
       render();
       return true;
     },
@@ -363,6 +455,7 @@
     destroy() {
       runCleanups();
       document.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('resize', onResize);
       if (host) host.remove();
       host = root = null; isOpen = false; activeId = null; activeVariant = null;
       document.documentElement.removeAttribute('data-ui-state');
